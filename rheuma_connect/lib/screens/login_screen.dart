@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'home_screen.dart';
 import '../providers/patient_provider.dart';
-import 'profile_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,48 +16,78 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      backgroundColor: const Color(0xFFDAFDF9), // Light background color
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 32.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            const Text(
+              'Login',
+              style: TextStyle(
+                fontSize: 38,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+                fontFamily: 'Serif', // Apply a serif-like font
+              ),
+            ),
+            const SizedBox(height: 50),
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-            ),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
+              decoration: InputDecoration(
+                hintText: 'username',
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+              ),
             ),
             const SizedBox(height: 20),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: 'password',
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+              ),
+            ),
+            const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () async {
                 final email = emailController.text;
                 final password = passwordController.text;
 
                 try {
-                  // Await the login operation
-                  await context.read<PatientProvider>().login(email, password);
+                  // Call login method and get the patientId from response
+                  final patientId = await context
+                      .read<PatientProvider>()
+                      .login(email, password);
 
-                  // Extract the patientId from the user object
-                  const patientId =
-                      '66fee8c8510f3ae604a4e9e2'; // Access the actual ID from the response
-
-                  // After login, fetch patient data
-
+                  // Fetch the patient details using the patientId
                   await context.read<PatientProvider>().fetchPatient(patientId);
 
-                  // Check if the widget is still mounted before navigating
+                  // If mounted, navigate to HomeScreen
                   if (mounted) {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (_) => ProfileScreen()),
+                      MaterialPageRoute(builder: (_) => HomeScreen()),
                     );
                   }
                 } catch (error) {
                   if (mounted) {
-                    // Display an error message using a valid context
+                    // Show error message if login fails
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
@@ -76,17 +106,45 @@ class _LoginScreenState extends State<LoginScreen> {
                   }
                 }
               },
-              child: const Text('Login'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF0D597C), // Dark blue color
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 80, vertical: 16), // Button size
+              ),
+              child: const Text(
+                'Login',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
             ),
-            TextButton(
-              onPressed: () {
-                // Navigate to the RegisterScreen (assuming you have the RegisterScreen ready)
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => RegisterScreen()),
-                );
-              },
-              child: const Text('Register'),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'New User?',
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // Navigate to the RegisterScreen
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => RegisterScreen()),
+                    );
+                  },
+                  child: const Text(
+                    'Create Account',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF0D597C),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
